@@ -3,17 +3,25 @@ class Automata {
         this.size = size
         this.ctx = ctx
         this.cells = []
+        this.generation = 1
+        this.population = 1
     }
 
     create() {
-        this.cells = new Array(this.size)
-            .fill('')
-            .map(() =>
-                new Array(this.size).fill('').map(() => Math.random() < 0.5)
-            )
+        this.cells = new Array(this.size).fill('').map(() =>
+            new Array(this.size).fill('').map(() => {
+                if (Math.random() < 0.2) {
+                    this.population = this.population + 1
+                    return true
+                }
+                return false
+            })
+        )
     }
 
     print() {
+        document.getElementById('generation').innerHTML = this.generation
+        document.getElementById('population').innerHTML = this.population
         this.ctx.clearRect(0, 0, this.size, this.size)
         for (let i = 0; i < this.size; i++) {
             for (let k = 0; k < this.size; k++) {
@@ -24,6 +32,7 @@ class Automata {
     }
 
     evaluate() {
+        this.population = 0
         let cellsAux = new Array(this.size)
             .fill('')
             .map(() => new Array(this.size).fill(false))
@@ -62,6 +71,7 @@ class Automata {
                     if (this.cells[x + 1][y + 1]) livingNeighbor++
 
                 if (this.cells[x][y]) {
+                    this.population++
                     cellsAux[x][y] =
                         livingNeighbor == 2 || livingNeighbor == 3
                             ? true
@@ -75,6 +85,7 @@ class Automata {
     }
 
     next() {
+        this.generation++
         this.print()
         this.evaluate()
     }
@@ -87,4 +98,4 @@ automata.create()
 
 setInterval(() => {
     automata.next()
-}, 300)
+}, 500)
